@@ -70,9 +70,11 @@ public class LoginForm extends  Form{
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
 
-                if(MyJDBC.validateLogin(username, password)) {
-                    JOptionPane.showMessageDialog(LoginForm.this, "Login Successfully");
-                } else {
+                if (MyJDBC.validateLogin(username, password)) {
+                    LoginForm.this.dispose();
+                    new StudentDashboard().setVisible(true);
+                }
+                else {
                     JOptionPane.showMessageDialog(LoginForm.this, "Login failed...");
                 }
             }
