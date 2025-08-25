@@ -268,7 +268,7 @@ public class StudentDashboard extends Form {
     }
 
     private void openUpdateForm(int id) {
-        JOptionPane.showMessageDialog(this, "Formulaire de modification pour l'étudiant ID: " + id, "Modifier Étudiant", JOptionPane.INFORMATION_MESSAGE);
+        new UpdateStudentForm(this, id);
     }
 
     private void deleteStudent(int id) {
