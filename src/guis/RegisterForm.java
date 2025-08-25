@@ -5,118 +5,256 @@ import db.MyJDBC;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class RegisterForm extends Form {
+    private JTextField usernameField;
+    private JPasswordField passwordField, rePasswordField;
+
     public RegisterForm() {
-        super("Register");
+        super("Inscription");
+        setLayout(new GridBagLayout());
+        getContentPane().setBackground(CommonConstants.SECONDARY_COLOR);
         addGuiComponents();
     }
 
     private void addGuiComponents() {
-        JLabel registerLabel = new JLabel("Register");
-        registerLabel.setBounds(0, 25, 520, 100);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Logo ou titre stylisé
+        JLabel logoLabel = new JLabel("e-Ecole");
+        logoLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        logoLabel.setForeground(CommonConstants.TEXT_COLOR);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(logoLabel, gbc);
+
+        // Titre
+        JLabel registerLabel = new JLabel("Inscription");
+        registerLabel.setFont(new Font("Arial", Font.BOLD, 28));
         registerLabel.setForeground(CommonConstants.TEXT_COLOR);
-        registerLabel.setFont(new Font("Dialog", Font.BOLD, 40));
-        registerLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        add(registerLabel);
+        gbc.gridy = 1;
+        add(registerLabel, gbc);
 
-        JLabel usernameLabel = new JLabel("Username : ");
-        usernameLabel.setBounds(30, 150, 400, 25);
+        // Champ Username
+        JLabel usernameLabel = new JLabel("Nom d'utilisateur :");
+        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         usernameLabel.setForeground(CommonConstants.TEXT_COLOR);
-        usernameLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+        gbc.gridwidth = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(usernameLabel, gbc);
 
-        JTextField usernameField = new JTextField();
-        usernameField.setBounds(30, 175, 450, 55);
-        usernameField.setBackground(CommonConstants.SECONDARY_COLOR);
-        usernameField.setForeground(CommonConstants.TEXT_COLOR);
-        usernameField.setFont(new Font("Dialog", Font.PLAIN, 24));
-
-        add(usernameLabel);
-        add(usernameField);
-
-        JLabel passwordLabel = new JLabel("Password : ");
-        passwordLabel.setBounds(30, 260, 400, 25);
-        passwordLabel.setForeground(CommonConstants.TEXT_COLOR);
-        passwordLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
-
-        JPasswordField passwordField = new JPasswordField();
-        passwordField.setBounds(30, 285, 450, 55);
-        passwordField.setBackground(CommonConstants.SECONDARY_COLOR);
-        passwordField.setForeground(CommonConstants.TEXT_COLOR);
-        passwordField.setFont(new Font("Dialog", Font.PLAIN, 24));
-
-        add(passwordLabel);
-        add(passwordField);
-
-        JLabel rePasswordLabel = new JLabel("Re-enter Password : ");
-        rePasswordLabel.setBounds(30, 370, 400, 25);
-        rePasswordLabel.setForeground(CommonConstants.TEXT_COLOR);
-        rePasswordLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
-
-        JPasswordField rePasswordField = new JPasswordField();
-        rePasswordField.setBounds(30, 395, 450, 55);
-        rePasswordField.setBackground(CommonConstants.SECONDARY_COLOR);
-        rePasswordField.setForeground(CommonConstants.TEXT_COLOR);
-        rePasswordField.setFont(new Font("Dialog", Font.PLAIN, 24));
-
-        add(rePasswordLabel);
-        add(rePasswordField);
-
-        JButton registerButton = new JButton("Register");
-        registerButton.setFont(new Font("Dialog", Font.BOLD, 18));
-        registerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        registerButton.setBackground(CommonConstants.TEXT_COLOR);
-        registerButton.setBounds(125, 520, 250, 50);
-
-        registerButton.addActionListener(new ActionListener() {
+        usernameField = new JTextField(20);
+        usernameField.setFont(new Font("Arial", Font.PLAIN, 16));
+        usernameField.setBackground(new Color(50, 50, 50));
+        usernameField.setForeground(Color.GRAY);
+        usernameField.setText("Entrez votre nom d'utilisateur");
+        usernameField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(CommonConstants.TEXT_COLOR, 1, true),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+        usernameField.addFocusListener(new FocusAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-                String rePassword = new String(rePasswordField.getPassword());
+            public void focusGained(FocusEvent e) {
+                if (usernameField.getText().equals("Entrez votre nom d'utilisateur")) {
+                    usernameField.setText("");
+                    usernameField.setForeground(CommonConstants.TEXT_COLOR);
+                }
+            }
 
-                if (validateUserInput(username, password, rePassword)) {
-                    if (MyJDBC.register(username, password)) {
-                        RegisterForm.this.dispose();
-                        LoginForm loginForm = new LoginForm();
-                        loginForm.setVisible(true);
-                        JOptionPane.showMessageDialog(loginForm, "Registered account successfully");
-                    } else {
-                        JOptionPane.showMessageDialog(RegisterForm.this, "Username already taken");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(RegisterForm.this, "Error: Username must be at least 6 characters and passwords must match");
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (usernameField.getText().isEmpty()) {
+                    usernameField.setText("Entrez votre nom d'utilisateur");
+                    usernameField.setForeground(Color.GRAY);
                 }
             }
         });
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(usernameField, gbc);
 
-        add(registerButton);
+        // Champ Password
+        JLabel passwordLabel = new JLabel("Mot de passe :");
+        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        passwordLabel.setForeground(CommonConstants.TEXT_COLOR);
+        gbc.gridy = 4;
+        add(passwordLabel, gbc);
 
-        JLabel loginLabel = new JLabel("Have account? Login Here");
-        loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        loginLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        passwordField = new JPasswordField(20);
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 16));
+        passwordField.setBackground(new Color(50, 50, 50));
+        passwordField.setForeground(Color.GRAY);
+        passwordField.setEchoChar((char) 0);
+        passwordField.setText("Entrez votre mot de passe");
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(CommonConstants.TEXT_COLOR, 1, true),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+        passwordField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (new String(passwordField.getPassword()).equals("Entrez votre mot de passe")) {
+                    passwordField.setText("");
+                    passwordField.setEchoChar('•');
+                    passwordField.setForeground(CommonConstants.TEXT_COLOR);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (new String(passwordField.getPassword()).isEmpty()) {
+                    passwordField.setEchoChar((char) 0);
+                    passwordField.setText("Entrez votre mot de passe");
+                    passwordField.setForeground(Color.GRAY);
+                }
+            }
+        });
+        gbc.gridy = 5;
+        add(passwordField, gbc);
+
+        // Champ Re-enter Password
+        JLabel rePasswordLabel = new JLabel("Confirmer mot de passe :");
+        rePasswordLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        rePasswordLabel.setForeground(CommonConstants.TEXT_COLOR);
+        gbc.gridy = 6;
+        add(rePasswordLabel, gbc);
+
+        rePasswordField = new JPasswordField(20);
+        rePasswordField.setFont(new Font("Arial", Font.PLAIN, 16));
+        rePasswordField.setBackground(new Color(50, 50, 50));
+        rePasswordField.setForeground(Color.GRAY);
+        rePasswordField.setEchoChar((char) 0);
+        rePasswordField.setText("Confirmez votre mot de passe");
+        rePasswordField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(CommonConstants.TEXT_COLOR, 1, true),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+        rePasswordField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (new String(rePasswordField.getPassword()).equals("Confirmez votre mot de passe")) {
+                    rePasswordField.setText("");
+                    rePasswordField.setEchoChar('•');
+                    rePasswordField.setForeground(CommonConstants.TEXT_COLOR);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (new String(rePasswordField.getPassword()).isEmpty()) {
+                    rePasswordField.setEchoChar((char) 0);
+                    rePasswordField.setText("Confirmez votre mot de passe");
+                    rePasswordField.setForeground(Color.GRAY);
+                }
+            }
+        });
+        gbc.gridy = 7;
+        add(rePasswordField, gbc);
+
+        // Bouton Register
+        JButton registerButton = new JButton("S'inscrire");
+        registerButton.setFont(new Font("Arial", Font.BOLD, 16));
+        registerButton.setBackground(CommonConstants.PRIMARY_COLOR);
+        registerButton.setForeground(CommonConstants.TEXT_COLOR);
+        registerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        registerButton.setBorder(BorderFactory.createLineBorder(CommonConstants.TEXT_COLOR, 1, true));
+        registerButton.setFocusPainted(false);
+        registerButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                registerButton.setBackground(CommonConstants.TEXT_COLOR);
+                registerButton.setForeground(CommonConstants.PRIMARY_COLOR);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                registerButton.setBackground(CommonConstants.PRIMARY_COLOR);
+                registerButton.setForeground(CommonConstants.TEXT_COLOR);
+            }
+        });
+        registerButton.addActionListener(e -> {
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
+            String rePassword = new String(rePasswordField.getPassword()).trim();
+
+            if (!validateUserInput(username, password, rePassword)) {
+                return;
+            }
+
+            if (MyJDBC.register(username, password)) {
+                RegisterForm.this.dispose();
+                LoginForm loginForm = new LoginForm();
+                loginForm.setVisible(true);
+                JOptionPane.showMessageDialog(loginForm, "Compte créé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(RegisterForm.this, "Erreur : le nom d'utilisateur est déjà pris.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        gbc.gridy = 8;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(registerButton, gbc);
+
+        // Lien Login
+        JLabel loginLabel = new JLabel("<html><u>Déjà un compte ? Connectez-vous ici</u></html>");
+        loginLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         loginLabel.setForeground(CommonConstants.TEXT_COLOR);
-
+        loginLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         loginLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 RegisterForm.this.dispose();
                 new LoginForm().setVisible(true);
             }
-        });
 
-        loginLabel.setBounds(125, 600, 250, 30);
-        add(loginLabel);
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                loginLabel.setForeground(Color.WHITE);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                loginLabel.setForeground(CommonConstants.TEXT_COLOR);
+            }
+        });
+        gbc.gridy = 9;
+        add(loginLabel, gbc);
+
+        // Configurer la fenêtre
+        setSize(500, 650);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private boolean validateUserInput(String username, String password, String rePassword) {
-        if (username.isEmpty() || password.isEmpty() || rePassword.isEmpty()) return false;
-        if (username.length() < 6) return false;
-        if (!password.equals(rePassword)) return false;
+        // Ignorer les placeholders
+        if (username.equals("Entrez votre nom d'utilisateur") || 
+            password.equals("Entrez votre mot de passe") || 
+            rePassword.equals("Confirmez votre mot de passe")) {
+            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Vérification de la longueur du nom d'utilisateur
+        if (username.length() < 6) {
+            JOptionPane.showMessageDialog(this, "Le nom d'utilisateur doit contenir au moins 6 caractères.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Vérification de la correspondance des mots de passe
+        if (!password.equals(rePassword)) {
+            JOptionPane.showMessageDialog(this, "Les mots de passe ne correspondent pas.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Vérification de la longueur du mot de passe
+        if (password.length() < 8) {
+            JOptionPane.showMessageDialog(this, "Le mot de passe doit contenir au moins 8 caractères.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
         return true;
     }
 }

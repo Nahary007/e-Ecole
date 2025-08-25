@@ -6,10 +6,10 @@ import javax.swing.*;
 
 public class AppLauncher {
     public static void main(String[] args) {
+        // MyJDBC.testConnection(); // Tester la connexion
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                // instantiate a loginForm obj and make it visible
                 new LoginForm().setVisible(true);
             }
         });

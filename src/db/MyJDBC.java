@@ -7,105 +7,123 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyJDBC {
-
-    public static boolean register(String username, String password) {
-        try {
-            if (!checkUser(username)) {
-                try (Connection connection = DriverManager.getConnection(
-                        CommonConstants.DB_URL,
-                        CommonConstants.DB_USERNAME,
-                        CommonConstants.DB_PASSWORD);
-                     PreparedStatement insertUser = connection.prepareStatement(
-                             "INSERT INTO " + CommonConstants.DB_USER_TABLE_NAME + " (username, password) VALUES (?, ?)")) {
-
-                    insertUser.setString(1, username);
-                    insertUser.setString(2, password);
-                    insertUser.executeUpdate();
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public static boolean checkUser(String username) {
-        try (Connection connection = DriverManager.getConnection(
-                CommonConstants.DB_URL,
-                CommonConstants.DB_USERNAME,
-                CommonConstants.DB_PASSWORD);
-             PreparedStatement checkUserExists = connection.prepareStatement(
-                     "SELECT * FROM " + CommonConstants.DB_USER_TABLE_NAME + " WHERE username = ?")) {
-
-            checkUserExists.setString(1, username);
-            ResultSet resultSet = checkUserExists.executeQuery();
-            if (!resultSet.isBeforeFirst()) {
-                return false;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
+    // Vérifier les identifiants de connexion
     public static boolean validateLogin(String username, String password) {
-        try (Connection connection = DriverManager.getConnection(
-                CommonConstants.DB_URL,
-                CommonConstants.DB_USERNAME,
-                CommonConstants.DB_PASSWORD);
-             PreparedStatement validateUser = connection.prepareStatement(
-                     "SELECT * FROM " + CommonConstants.DB_USER_TABLE_NAME + " WHERE username = ? AND password = ?")) {
-
-            validateUser.setString(1, username);
-            validateUser.setString(2, password);
-            ResultSet resultSet = validateUser.executeQuery();
-            if (!resultSet.isBeforeFirst()) {
-                return false;
-            }
+        try (Connection conn = DriverManager.getConnection(CommonConstants.DB_URL, CommonConstants.DB_USERNAME, CommonConstants.DB_PASSWORD)) {
+            String sql = "SELECT * FROM " + CommonConstants.DB_USER_TABLE_NAME + " WHERE username = ? AND password = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return true;
     }
 
-    private static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-                CommonConstants.DB_URL,
-                CommonConstants.DB_USERNAME,
-                CommonConstants.DB_PASSWORD
-        );
+    // Enregistrer un nouvel utilisateur
+    public static boolean register(String username, String password) {
+        try (Connection conn = DriverManager.getConnection(CommonConstants.DB_URL, CommonConstants.DB_USERNAME, CommonConstants.DB_PASSWORD)) {
+            String sql = "INSERT INTO " + CommonConstants.DB_USER_TABLE_NAME + " (username, password) VALUES (?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
+    // Récupérer tous les étudiants
     public static List<String[]> getAllStudents() {
         List<String[]> students = new ArrayList<>();
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement("SELECT id, nom, prenom, email, filiere FROM students");
-             ResultSet rs = ps.executeQuery()) {
-
+        try (Connection conn = DriverManager.getConnection(CommonConstants.DB_URL, CommonConstants.DB_USERNAME, CommonConstants.DB_PASSWORD)) {
+            String sql = "SELECT id, nom, prenom, email, filiere FROM students";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 students.add(new String[]{
-                        String.valueOf(rs.getInt("id")),
-                        rs.getString("nom"),
-                        rs.getString("prenom"),
-                        rs.getString("email"),
-                        rs.getString("filiere")
+                    String.valueOf(rs.getInt("id")),
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getString("email"),
+                    rs.getString("filiere")
                 });
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return students;
     }
 
+    // Supprimer un étudiant
     public static boolean deleteStudent(int id) {
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement("DELETE FROM students WHERE id = ?")) {
+        try (Connection conn = DriverManager.getConnection(CommonConstants.DB_URL, CommonConstants.DB_USERNAME, CommonConstants.DB_PASSWORD)) {
+            String sql = "DELETE FROM students WHERE id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-            ps.setInt(1, id);
-            int rows = ps.executeUpdate();
-            return rows > 0;
-        } catch (Exception e) {
+    // Récupérer un étudiant par ID
+    public static String[] getStudentById(int id) {
+        try (Connection conn = DriverManager.getConnection(CommonConstants.DB_URL, CommonConstants.DB_USERNAME, CommonConstants.DB_PASSWORD)) {
+            String sql = "SELECT nom, prenom, email, filiere FROM students WHERE id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new String[]{
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getString("email"),
+                    rs.getString("filiere")
+                };
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Mettre à jour un étudiant
+    public static boolean updateStudent(int id, String nom, String prenom, String email, String filiere) {
+        try (Connection conn = DriverManager.getConnection(CommonConstants.DB_URL, CommonConstants.DB_USERNAME, CommonConstants.DB_PASSWORD)) {
+            String sql = "UPDATE students SET nom = ?, prenom = ?, email = ?, filiere = ? WHERE id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nom);
+            stmt.setString(2, prenom);
+            stmt.setString(3, email);
+            stmt.setString(4, filiere);
+            stmt.setInt(5, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Ajouter un étudiant
+    public static boolean addStudent(String nom, String prenom, String email, String filiere) {
+        try (Connection conn = DriverManager.getConnection(CommonConstants.DB_URL, CommonConstants.DB_USERNAME, CommonConstants.DB_PASSWORD)) {
+            String sql = "INSERT INTO students (nom, prenom, email, filiere) VALUES (?, ?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nom);
+            stmt.setString(2, prenom);
+            stmt.setString(3, email);
+            stmt.setString(4, filiere);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
