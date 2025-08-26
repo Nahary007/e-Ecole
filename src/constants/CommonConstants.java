@@ -7,6 +7,8 @@ public class CommonConstants {
     public static final Color PRIMARY_COLOR = Color.decode("#191E29");
     public static final Color SECONDARY_COLOR = Color.decode("#132D46");
     public static final Color TEXT_COLOR = Color.decode("#01C38D");
+    public static final Color WHITE_COLOR = Color.decode("#FFFFFF");
+    public static final Color BLACK_COLOR = Color.decode("#000000");
 
     //mysql credentials
     public static final String DB_URL = "jdbc:mysql://localhost:3306/school_db";
