@@ -4,24 +4,35 @@ import constants.CommonConstants;
 
 import javax.swing.*;
 
-public class Form extends  JFrame{
-    //create constructor
+/**
+ * Fenêtre principale du formulaire, héritée de JFrame.
+ */
+public class Form extends JFrame {
+    /**
+     * Constructeur qui initialise la fenêtre avec les paramètres de base.
+     * @param title titre affiché dans la barre de titre
+     */
     public Form(String title) {
 
-        //set the title for the title bar
+        // Définit le titre de la fenêtre
         super(title);
 
+        // Définit la taille de la fenêtre
         setSize(520, 680);
 
-        //configure GUI to end process after closing
+        // Ferme l'application lorsque la fenêtre est fermée
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+        // Utilise un layout nul pour placer les composants manuellement
         setLayout(null);
 
+        // Centre la fenêtre sur l'écran
         setLocationRelativeTo(null);
 
+        // Empêche le redimensionnement de la fenêtre
         setResizable(false);
 
+        // Définit la couleur de fond de la fenêtre
         getContentPane().setBackground(CommonConstants.PRIMARY_COLOR);
     }
 }
