@@ -11,6 +11,7 @@ public class RegisterForm extends Form {
     private JTextField usernameField;
     private JPasswordField passwordField, rePasswordField;
 
+    // Constructeur : initialise la fenêtre d'inscription, définit la mise en page et les couleurs
     public RegisterForm() {
         super("Inscription");
 
@@ -18,9 +19,11 @@ public class RegisterForm extends Form {
         setLayout(new GridBagLayout());
         getContentPane().setBackground(CommonConstants.PRIMARY_COLOR);
 
+        // Ajout des composants graphiques
         addGuiComponents();
     }
 
+    // Ajoute et configure tous les composants graphiques (logo, champs, boutons, liens, etc.)
     private void addGuiComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 15, 15, 15);
@@ -33,7 +36,6 @@ public class RegisterForm extends Form {
         logoLabel.setForeground(CommonConstants.TEXT_COLOR);
         gbc.gridy = 0;
         add(logoLabel, gbc);
-
 
         // ====== Champ Username ======
         usernameField = createStyledTextField("Nom d'utilisateur");
@@ -59,7 +61,7 @@ public class RegisterForm extends Form {
         registerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         registerButton.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
 
-        // Effet hover
+        // Effet hover sur le bouton
         registerButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -74,14 +76,16 @@ public class RegisterForm extends Form {
             }
         });
 
-        // Action d'inscription
+        // Action d'inscription quand on clique sur le bouton
         registerButton.addActionListener(e -> {
             String username = usernameField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
             String rePassword = new String(rePasswordField.getPassword()).trim();
 
+            // Validation des entrées utilisateur
             if (!validateUserInput(username, password, rePassword)) return;
 
+            // Enregistrement via MyJDBC
             if (MyJDBC.register(username, password)) {
                 RegisterForm.this.dispose();
                 LoginForm loginForm = new LoginForm();
@@ -98,12 +102,13 @@ public class RegisterForm extends Form {
         gbc.anchor = GridBagConstraints.CENTER;
         add(registerButton, gbc);
 
-        // ====== Lien Login ======
+        // ====== Lien vers Login ======
         JLabel loginLabel = new JLabel("<html><u>Déjà un compte ? Connectez-vous</u></html>", JLabel.CENTER);
         loginLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         loginLabel.setForeground(Color.LIGHT_GRAY);
         loginLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        // Action : ouvrir la fenêtre Login au clic
         loginLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -125,13 +130,13 @@ public class RegisterForm extends Form {
         gbc.gridy = 6;
         add(loginLabel, gbc);
 
-        // ====== Config fenêtre ======
+        // ====== Configuration de la fenêtre ======
         setSize(600, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    // ====== Création champs stylisés ======
+    // Crée un champ de texte stylisé avec placeholder et gestion du focus
     private JTextField createStyledTextField(String placeholder) {
         JTextField field = new JTextField(placeholder, 20);
         field.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -142,6 +147,7 @@ public class RegisterForm extends Form {
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
+        // Gestion du placeholder (effacement quand focus, remise si vide au blur)
         field.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -165,17 +171,19 @@ public class RegisterForm extends Form {
         return field;
     }
 
+    // Crée un champ mot de passe stylisé avec placeholder et gestion du focus
     private JPasswordField createStyledPasswordField(String placeholder) {
         JPasswordField field = new JPasswordField(placeholder, 20);
         field.setFont(new Font("Arial", Font.PLAIN, 16));
         field.setBackground(new Color(40, 50, 70));
         field.setForeground(Color.GRAY);
-        field.setEchoChar((char) 0);
+        field.setEchoChar((char) 0); // pas de masquage tant que placeholder
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.GRAY, 1, true),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
+        // Gestion du placeholder et masquage des caractères
         field.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -202,7 +210,7 @@ public class RegisterForm extends Form {
         return field;
     }
 
-    // ====== Validation des entrées ======
+    // Vérifie la validité des entrées utilisateur (champs remplis, longueur, correspondance des mots de passe)
     private boolean validateUserInput(String username, String password, String rePassword) {
         if (username.equals("Nom d'utilisateur") ||
                 password.equals("Mot de passe") ||
