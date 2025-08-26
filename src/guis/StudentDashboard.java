@@ -249,8 +249,9 @@ public class StudentDashboard extends Form {
             }
         });
 
-        // Configurer la fenêtre
-        setSize(700, 550);
+        // Configurer la fenêtre en plein écran
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // ✅ plein écran uniquement pour StudentDashboard
+        setResizable(true); // autorise le redimensionnement
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -291,7 +292,7 @@ public class StudentDashboard extends Form {
         if (studentData != null) {
             String details = String.format(
                     "<html><b>Détails de l'étudiant</b><br>" +
-                    "ID: %d<br>Nom: %s<br>Prénom: %s<br>Email: %s<br>Filière: %s</html>",
+                            "ID: %d<br>Nom: %s<br>Prénom: %s<br>Email: %s<br>Filière: %s</html>",
                     id, studentData[0], studentData[1], studentData[2], studentData[3]);
             JOptionPane.showMessageDialog(this, details, "Détails Étudiant", JOptionPane.INFORMATION_MESSAGE);
         } else {
